@@ -1,0 +1,48 @@
+import re
+import hashlib
+import ssl
+import mysql.connector
+from flask import Flask, request
+from flask_wtf import CSRFProtect
+
+app = Flask(__name__)
+app.config['WTF_CSRF_ENABLED'] = False  # ❌ Disabling CSRF protection
+
+csrf = CSRFProtect(app)  # Non attivo effettivamente
+
+# ❌ Weak SSL/TLS usage
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+
+# ❌ Insecure DB password
+conn = mysql.connector.connect(
+    host="localhost",
+    user="admin",
+    password="1234",  # ❌ Weak, hardcoded password
+    database="test"
+)
+
+@app.route("/")
+def index():
+    exec("print('hello world')")  # ❌ Dangerous usage of exec
+    return "Hello!"
+
+def process_data(data):
+    new_data = data
+    new_data = new_data + "abc"  # ❌ Use of "=+" instead of "+="
+    return new_data
+
+def sanitize(text):
+    # ❌ regex used where str.replace would be enough
+    return re.sub(r"<", "&lt;", text)
+
+def update_user_score(score):
+    score = score  # ❌ Self-assignment, has no effect
+    if True:  # ❌ Constant used as condition
+        print("Score updated")
+
+def empty_function():
+    pass  # ❌ Empty function
+
+def hash_password(password):
+    salt = "1234"  # ❌ Weak, predictable salt
+    return hashlib.sha256((password + salt).encode()).hexdigest()
